@@ -1,15 +1,22 @@
 <?php
-require_once 'DBConnect.php';
+require_once 'candidato.php';
+require_once 'conecta.php';
 
-$candidatoCRUD = new CandidatoCRUD();
+$conexao = new Conexao();
+$candidato = new Candidato($conexao);
 
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
+    $id = $_POST["id"];
     $nome = $_POST["nome"];
     $cpf = $_POST["cpf"];
     $telefone = $_POST["telefone"];
     $escolaPublica = isset($_POST["escolaPublica"]) ? true : false;
 
-    $candidatoCRUD->cadastrarCandidato($nome, $cpf, $telefone, $escolaPublica);
+    if (!empty($id)) {
+        $candidato->editarCandidato($id, $nome, $cpf, $telefone, $escolaPublica);
+    } else {
+        $candidato->cadastrarCandidato($nome, $cpf, $telefone, $escolaPublica);
+    }
 }
 
 if (isset($_GET["action"])) {
@@ -17,7 +24,7 @@ if (isset($_GET["action"])) {
 
     if ($action == "delete" && isset($_GET["id"])) {
         $id = $_GET["id"];
-        $candidatoCRUD->excluirCandidato($id);
+        $candidato->excluirCandidato($id);
     }
 }
 ?>
@@ -30,6 +37,7 @@ if (isset($_GET["action"])) {
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Avaliação 2: Desenvolvimento Web</title>
+    <link rel="stylesheet" href="style.css">
 </head>
 
 <body>
@@ -42,6 +50,7 @@ if (isset($_GET["action"])) {
 
             <div>
                 <form action="<?php echo $_SERVER['PHP_SELF']; ?>" method="post">
+                    <input type="hidden" name="id" value="">
                     <label for="nome">Nome:</label>
                     <input type="text" name="nome" id="nome" required>
 
@@ -67,7 +76,7 @@ if (isset($_GET["action"])) {
 
         <section>
             <?php
-            $candidatoCRUD->listarCandidatos();
+            $candidato->listarCandidatos();
             ?>
         </section>
     </main>
